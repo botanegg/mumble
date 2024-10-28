@@ -23,6 +23,7 @@
 #include "User.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTimeZone>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
@@ -1210,7 +1211,11 @@ QList< UserInfo > Server::getRegisteredUsersEx() {
 		userinfo.name         = query.value(1).toString();
 		userinfo.last_channel = query.value(2).toInt();
 		userinfo.last_active  = QDateTime::fromString(query.value(3).toString(), Qt::ISODate);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 		userinfo.last_active.setTimeSpec(Qt::UTC);
+#else
+		userinfo.last_active.setTimeZone(QTimeZone::UTC);
+#endif
 
 		users << userinfo;
 	}
@@ -2220,14 +2225,22 @@ int Server::readLastChannel(int id) {
 		}
 
 		QDateTime last_active = QDateTime::fromString(query.value(1).toString(), Qt::ISODate);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 		last_active.setTimeSpec(Qt::UTC);
+#else
+		last_active.setTimeZone(QTimeZone::UTC);
+#endif
 		QDateTime last_disconnect;
 
 		// NULL column for last_disconnect will yield an empty invalid QDateTime object.
 		// Using that object with QDateTime::secsTo() will return 0 as per Qt specification.
 		if (!query.value(2).isNull()) {
 			last_disconnect = QDateTime::fromString(query.value(2).toString(), Qt::ISODate);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 			last_disconnect.setTimeSpec(Qt::UTC);
+#else
+			last_disconnect.setTimeZone(QTimeZone::UTC);
+#endif
 		}
 
 		if (last_active.secsTo(last_disconnect) <= 0) {
@@ -2312,7 +2325,11 @@ void Server::getBans() {
 		ban.qsHash     = query.value(3).toString();
 		ban.qsReason   = query.value(4).toString();
 		ban.qdtStart   = query.value(5).toDateTime();
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 		ban.qdtStart.setTimeSpec(Qt::UTC);
+#else
+		ban.qdtStart.setTimeZone(QTimeZone::UTC);
+#endif
 		ban.iDuration = query.value(6).toUInt();
 
 		if (ban.isValid())
