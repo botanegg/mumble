@@ -9,6 +9,8 @@
 #include "QtUtils.h"
 #include "Utils.h"
 
+#include <QtCore/QTimeZone>
+
 #include <algorithm>
 
 #ifdef _MSC_VER
@@ -296,6 +298,10 @@ QString UserListModel::pathForChannelId(const unsigned int channelId) const {
 
 QDateTime UserListModel::isoUTCToDateTime(const std::string &isoTime) const {
 	QDateTime dt = QDateTime::fromString(u8(isoTime), Qt::ISODate);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 	dt.setTimeSpec(Qt::UTC);
+#else
+	dt.setTimeZone(QTimeZone::UTC);
+#endif
 	return dt;
 }
