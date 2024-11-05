@@ -73,10 +73,10 @@ void SocketRPCClient::readyRead() {
 
 void SocketRPCClient::processXml() {
 	QDomDocument qdd;
-#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
-	qdd.setContent(qbaOutput, false);
-#else
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 	qdd.setContent(qbaOutput, QDomDocument::ParseOption::Default);
+#else
+	qdd.setContent(qbaOutput, false);
 #endif
 
 	QDomElement request = qdd.firstChildElement();
